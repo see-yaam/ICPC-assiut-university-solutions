@@ -1,0 +1,771 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CP Solutions</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Syne:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0a0f;
+    --surface: #12121a;
+    --surface2: #1a1a26;
+    --border: #2a2a3d;
+    --accent: #7c6af7;
+    --accent2: #4fffb0;
+    --text: #e8e8f0;
+    --text-muted: #6b6b8a;
+    --text-dim: #9898b8;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Syne', sans-serif;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  /* HEADER */
+  header {
+    padding: 16px 28px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    background: var(--surface);
+    flex-shrink: 0;
+  }
+
+  .logo {
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 700;
+    font-size: 1.1rem;
+    color: var(--accent2);
+    letter-spacing: -0.5px;
+  }
+
+  .logo span { color: var(--accent); }
+
+  header p {
+    color: var(--text-muted);
+    font-size: 0.8rem;
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  .stats {
+    margin-left: auto;
+    display: flex;
+    gap: 20px;
+  }
+
+  .stat {
+    text-align: right;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.75rem;
+  }
+
+  .stat-num {
+    color: var(--accent2);
+    font-weight: 700;
+    font-size: 1rem;
+  }
+
+  .stat-label { color: var(--text-muted); }
+
+  /* MAIN LAYOUT */
+  .layout {
+    display: grid;
+    grid-template-columns: 220px 280px 1fr;
+    flex: 1;
+    overflow: hidden;
+  }
+
+  /* SIDEBAR - TOPICS */
+  .sidebar {
+    border-right: 1px solid var(--border);
+    overflow-y: auto;
+    background: var(--surface);
+  }
+
+  .sidebar-header {
+    padding: 14px 16px;
+    font-size: 0.65rem;
+    font-family: 'JetBrains Mono', monospace;
+    color: var(--text-muted);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .topic-item {
+    padding: 12px 16px;
+    cursor: pointer;
+    border-bottom: 1px solid rgba(42,42,61,0.5);
+    transition: all 0.15s;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+  }
+
+  .topic-item:hover { background: var(--surface2); }
+  .topic-item.active {
+    background: var(--surface2);
+    border-left: 3px solid var(--accent);
+    padding-left: 13px;
+  }
+
+  .topic-icon {
+    width: 28px;
+    height: 28px;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.9rem;
+    flex-shrink: 0;
+  }
+
+  .topic-info { flex: 1; }
+
+  .topic-name {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--text);
+  }
+
+  .topic-count {
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  .topic-badge {
+    font-size: 0.65rem;
+    font-family: 'JetBrains Mono', monospace;
+    background: rgba(124,106,247,0.15);
+    color: var(--accent);
+    padding: 2px 7px;
+    border-radius: 20px;
+    border: 1px solid rgba(124,106,247,0.3);
+  }
+
+  /* PROBLEM LIST */
+  .problem-list {
+    border-right: 1px solid var(--border);
+    overflow-y: auto;
+    background: var(--bg);
+  }
+
+  .problem-list-header {
+    padding: 14px 16px;
+    font-size: 0.65rem;
+    font-family: 'JetBrains Mono', monospace;
+    color: var(--text-muted);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    border-bottom: 1px solid var(--border);
+    position: sticky;
+    top: 0;
+    background: var(--bg);
+    z-index: 1;
+  }
+
+  .problem-item {
+    padding: 14px 16px;
+    cursor: pointer;
+    border-bottom: 1px solid rgba(42,42,61,0.4);
+    transition: all 0.15s;
+  }
+
+  .problem-item:hover { background: var(--surface); }
+  .problem-item.active { background: var(--surface); border-left: 3px solid var(--accent2); padding-left: 13px; }
+
+  .problem-title {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--text);
+    margin-bottom: 6px;
+  }
+
+  .problem-meta {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .diff {
+    font-size: 0.65rem;
+    font-family: 'JetBrains Mono', monospace;
+    padding: 2px 8px;
+    border-radius: 3px;
+    font-weight: 600;
+  }
+
+  .diff-easy { background: rgba(79,255,176,0.1); color: var(--accent2); border: 1px solid rgba(79,255,176,0.25); }
+  .diff-medium { background: rgba(255,183,77,0.1); color: #ffb74d; border: 1px solid rgba(255,183,77,0.25); }
+  .diff-hard { background: rgba(255,82,82,0.1); color: #ff5252; border: 1px solid rgba(255,82,82,0.25); }
+
+  .cf-link {
+    font-size: 0.65rem;
+    font-family: 'JetBrains Mono', monospace;
+    color: var(--text-muted);
+  }
+
+  /* CODE PANEL */
+  .code-panel {
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .empty-state {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-muted);
+    gap: 12px;
+  }
+
+  .empty-icon {
+    font-size: 3rem;
+    opacity: 0.3;
+  }
+
+  .empty-text {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.8rem;
+    color: var(--text-muted);
+  }
+
+  .solution-view { padding: 24px; }
+
+  .solution-header {
+    margin-bottom: 24px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .solution-header h2 {
+    font-size: 1.4rem;
+    font-weight: 800;
+    margin-bottom: 8px;
+  }
+
+  .solution-tags {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-top: 12px;
+  }
+
+  .tag {
+    font-size: 0.7rem;
+    font-family: 'JetBrains Mono', monospace;
+    background: rgba(124,106,247,0.1);
+    color: var(--accent);
+    padding: 3px 10px;
+    border-radius: 3px;
+    border: 1px solid rgba(124,106,247,0.2);
+  }
+
+  .section-label {
+    font-size: 0.65rem;
+    font-family: 'JetBrains Mono', monospace;
+    color: var(--text-muted);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+    margin-top: 22px;
+  }
+
+  .explanation {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 16px;
+    font-size: 0.88rem;
+    line-height: 1.7;
+    color: var(--text-dim);
+  }
+
+  .code-block {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+  }
+
+  .code-topbar {
+    padding: 10px 16px;
+    background: var(--surface2);
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .code-lang {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.7rem;
+    color: var(--accent2);
+    font-weight: 600;
+  }
+
+  .copy-btn {
+    background: none;
+    border: 1px solid var(--border);
+    color: var(--text-muted);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.7rem;
+    padding: 4px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+
+  .copy-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+  pre {
+    padding: 16px;
+    overflow-x: auto;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.8rem;
+    line-height: 1.6;
+    color: var(--text);
+  }
+
+  /* Scrollbar */
+  ::-webkit-scrollbar { width: 5px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 10px; }
+
+  /* Animations */
+  .topic-item, .problem-item { animation: fadeIn 0.2s ease; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateX(-4px); } to { opacity: 1; transform: translateX(0); } }
+
+  .solution-view { animation: slideIn 0.25s ease; }
+  @keyframes slideIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+</style>
+</head>
+<body>
+
+<header>
+  <div>
+    <div class="logo"><span>&lt;</span>cp<span>/</span>solutions<span>&gt;</span></div>
+    <p>// ICPC & Codeforces problem archive</p>
+  </div>
+  <div class="stats">
+    <div class="stat">
+      <div class="stat-num" id="total-problems">0</div>
+      <div class="stat-label">problems</div>
+    </div>
+    <div class="stat">
+      <div class="stat-num" id="total-topics">0</div>
+      <div class="stat-label">topics</div>
+    </div>
+  </div>
+</header>
+
+<div class="layout">
+  <!-- TOPICS -->
+  <div class="sidebar">
+    <div class="sidebar-header">// topics</div>
+    <div id="topic-list"></div>
+  </div>
+
+  <!-- PROBLEMS -->
+  <div class="problem-list">
+    <div class="problem-list-header" id="problem-list-title">// select a topic</div>
+    <div id="problem-list"></div>
+  </div>
+
+  <!-- CODE VIEW -->
+  <div class="code-panel" id="code-panel">
+    <div class="empty-state">
+      <div class="empty-icon">⌨</div>
+      <div class="empty-text">// select a problem to view solution</div>
+    </div>
+  </div>
+</div>
+
+<script>
+// =============================================
+// DATA — Add your problems here!
+// =============================================
+const data = {
+  "Array": {
+    icon: "[]",
+    color: "#7c6af7",
+    problems: [
+      {
+        id: "a1",
+        title: "Two Sum",
+        difficulty: "easy",
+        link: "https://codeforces.com/problemset/problem/1/A",
+        tags: ["hash map", "two pointer"],
+        explanation: "দুইটা number এর sum target এর সমান হলে তাদের index return করতে হবে। HashMap দিয়ে O(n) এ করা যায়। প্রতিটা element এর জন্য দেখো target - current কি আগে দেখেছি।",
+        code: `#include <bits/stdc++.h>
+using namespace std;
+
+vector<int> twoSum(vector<int>& nums, int target) {
+    unordered_map<int, int> mp;
+    for (int i = 0; i < nums.size(); i++) {
+        int need = target - nums[i];
+        if (mp.count(need)) {
+            return {mp[need], i};
+        }
+        mp[nums[i]] = i;
+    }
+    return {};
+}`
+      },
+      {
+        id: "a2",
+        title: "Maximum Subarray (Kadane's)",
+        difficulty: "medium",
+        link: "https://codeforces.com/problemset/problem/363/B",
+        tags: ["dp", "greedy"],
+        explanation: "Kadane's algorithm ব্যবহার করো। currentSum যদি negative হয়ে যায় তাহলে সেটা ছেড়ে দাও এবং নতুন করে শুরু করো। maxSum সবসময় track করো।",
+        code: `#include <bits/stdc++.h>
+using namespace std;
+
+int maxSubArray(vector<int>& nums) {
+    int maxSum = nums[0];
+    int curr = nums[0];
+    
+    for (int i = 1; i < nums.size(); i++) {
+        curr = max(nums[i], curr + nums[i]);
+        maxSum = max(maxSum, curr);
+    }
+    return maxSum;
+}`
+      },
+      {
+        id: "a3",
+        title: "Rotate Array",
+        difficulty: "easy",
+        link: "https://codeforces.com/problemset/problem/1/A",
+        tags: ["reverse", "in-place"],
+        explanation: "তিনটা reverse দিয়ে করো। পুরো array reverse করো, তারপর প্রথম k টা reverse করো, তারপর বাকি অংশ reverse করো।",
+        code: `#include <bits/stdc++.h>
+using namespace std;
+
+void rotate(vector<int>& nums, int k) {
+    int n = nums.size();
+    k = k % n;
+    reverse(nums.begin(), nums.end());
+    reverse(nums.begin(), nums.begin() + k);
+    reverse(nums.begin() + k, nums.end());
+}`
+      }
+    ]
+  },
+  "Graph": {
+    icon: "◈",
+    color: "#4fffb0",
+    problems: [
+      {
+        id: "g1",
+        title: "BFS Shortest Path",
+        difficulty: "medium",
+        link: "https://codeforces.com/problemset/problem/580/C",
+        tags: ["bfs", "shortest path"],
+        explanation: "Unweighted graph এ shortest path বের করতে BFS ব্যবহার করো। Queue তে source node দিয়ে শুরু করো এবং level by level explore করো। প্রথমবার destination এ পৌঁছানোই shortest path।",
+        code: `#include <bits/stdc++.h>
+using namespace std;
+
+int bfsShortestPath(vector<vector<int>>& adj, int src, int dest) {
+    int n = adj.size();
+    vector<int> dist(n, -1);
+    queue<int> q;
+    
+    dist[src] = 0;
+    q.push(src);
+    
+    while (!q.empty()) {
+        int u = q.front(); q.pop();
+        for (int v : adj[u]) {
+            if (dist[v] == -1) {
+                dist[v] = dist[u] + 1;
+                q.push(v);
+            }
+        }
+    }
+    return dist[dest];
+}`
+      },
+      {
+        id: "g2",
+        title: "Detect Cycle (DFS)",
+        difficulty: "medium",
+        link: "https://codeforces.com/problemset/problem/510/B",
+        tags: ["dfs", "cycle detection"],
+        explanation: "Directed graph এ cycle detect করতে DFS এ তিনটা state রাখো: unvisited, in-stack, done। যদি in-stack node এ আবার আসো তাহলে cycle আছে।",
+        code: `#include <bits/stdc++.h>
+using namespace std;
+
+bool dfs(int u, vector<vector<int>>& adj, 
+         vector<int>& color) {
+    color[u] = 1; // in stack
+    for (int v : adj[u]) {
+        if (color[v] == 1) return true; // cycle!
+        if (color[v] == 0 && dfs(v, adj, color))
+            return true;
+    }
+    color[u] = 2; // done
+    return false;
+}
+
+bool hasCycle(int n, vector<vector<int>>& adj) {
+    vector<int> color(n, 0);
+    for (int i = 0; i < n; i++)
+        if (color[i] == 0 && dfs(i, adj, color))
+            return true;
+    return false;
+}`
+      }
+    ]
+  },
+  "Dynamic Programming": {
+    icon: "◇",
+    color: "#ff7043",
+    problems: [
+      {
+        id: "d1",
+        title: "0/1 Knapsack",
+        difficulty: "hard",
+        link: "https://codeforces.com/problemset/problem/416/C",
+        tags: ["dp", "knapsack", "classic"],
+        explanation: "dp[i][w] = প্রথম i টা item ব্যবহার করে weight w এর মধ্যে maximum value। প্রতিটা item হয় নেবো নয়তো নেবো না। দুইটা option এর মধ্যে maximum নাও।",
+        code: `#include <bits/stdc++.h>
+using namespace std;
+
+int knapsack(int W, vector<int>& wt, vector<int>& val) {
+    int n = wt.size();
+    vector<vector<int>> dp(n+1, vector<int>(W+1, 0));
+    
+    for (int i = 1; i <= n; i++) {
+        for (int w = 0; w <= W; w++) {
+            dp[i][w] = dp[i-1][w]; // don't take
+            if (wt[i-1] <= w) {
+                dp[i][w] = max(dp[i][w],
+                    dp[i-1][w-wt[i-1]] + val[i-1]);
+            }
+        }
+    }
+    return dp[n][W];
+}`
+      },
+      {
+        id: "d2",
+        title: "Longest Common Subsequence",
+        difficulty: "medium",
+        link: "https://codeforces.com/problemset/problem/346/B",
+        tags: ["dp", "string", "classic"],
+        explanation: "dp[i][j] = s1 এর প্রথম i char এবং s2 এর প্রথম j char এর LCS length। যদি শেষ char match করে তাহলে dp[i-1][j-1] + 1, না হলে max(dp[i-1][j], dp[i][j-1])।",
+        code: `#include <bits/stdc++.h>
+using namespace std;
+
+int lcs(string& s1, string& s2) {
+    int m = s1.size(), n = s2.size();
+    vector<vector<int>> dp(m+1, vector<int>(n+1, 0));
+    
+    for (int i = 1; i <= m; i++) {
+        for (int j = 1; j <= n; j++) {
+            if (s1[i-1] == s2[j-1])
+                dp[i][j] = dp[i-1][j-1] + 1;
+            else
+                dp[i][j] = max(dp[i-1][j], dp[i][j-1]);
+        }
+    }
+    return dp[m][n];
+}`
+      }
+    ]
+  },
+  "String": {
+    icon: '""',
+    color: "#ab47bc",
+    problems: [
+      {
+        id: "s1",
+        title: "Check Palindrome",
+        difficulty: "easy",
+        link: "https://codeforces.com/problemset/problem/1/A",
+        tags: ["two pointer", "string"],
+        explanation: "Two pointer দিয়ে দুই দিক থেকে compare করো। Left pointer আর right pointer যতক্ষণ মিলছে ততক্ষণ এগিয়ে যাও। কোথাও না মিললে palindrome না।",
+        code: `#include <bits/stdc++.h>
+using namespace std;
+
+bool isPalindrome(string s) {
+    int l = 0, r = s.size() - 1;
+    while (l < r) {
+        if (s[l] != s[r]) return false;
+        l++; r--;
+    }
+    return true;
+}`
+      }
+    ]
+  },
+  "Tree": {
+    icon: "⑂",
+    color: "#26c6da",
+    problems: [
+      {
+        id: "t1",
+        title: "Height of Binary Tree",
+        difficulty: "easy",
+        link: "https://codeforces.com/problemset/problem/1/A",
+        tags: ["recursion", "dfs", "tree"],
+        explanation: "Recursion দিয়ে করো। Left subtree আর right subtree এর height বের করো, বেশি যেটা সেটায় 1 যোগ করো। Base case: null node এর height 0।",
+        code: `#include <bits/stdc++.h>
+using namespace std;
+
+struct Node {
+    int val;
+    Node *left, *right;
+};
+
+int height(Node* root) {
+    if (!root) return 0;
+    return 1 + max(height(root->left), 
+                   height(root->right));
+}`
+      }
+    ]
+  }
+};
+
+// =============================================
+// RENDER
+// =============================================
+let activeTopicKey = null;
+let activeProblemId = null;
+
+function countProblems() {
+  return Object.values(data).reduce((s, t) => s + t.problems.length, 0);
+}
+
+function renderTopics() {
+  document.getElementById('total-topics').textContent = Object.keys(data).length;
+  document.getElementById('total-problems').textContent = countProblems();
+
+  const container = document.getElementById('topic-list');
+  container.innerHTML = '';
+
+  Object.entries(data).forEach(([key, topic]) => {
+    const el = document.createElement('div');
+    el.className = 'topic-item' + (key === activeTopicKey ? ' active' : '');
+    el.innerHTML = `
+      <div class="topic-icon" style="background: ${topic.color}18; color: ${topic.color}; font-family: 'JetBrains Mono', monospace; font-size: 0.7rem; font-weight: 700">${topic.icon}</div>
+      <div class="topic-info">
+        <div class="topic-name">${key}</div>
+        <div class="topic-count">${topic.problems.length} problems</div>
+      </div>
+      <div class="topic-badge">${topic.problems.length}</div>
+    `;
+    el.onclick = () => selectTopic(key);
+    container.appendChild(el);
+  });
+}
+
+function selectTopic(key) {
+  activeTopicKey = key;
+  activeProblemId = null;
+  renderTopics();
+  renderProblems();
+  document.getElementById('code-panel').innerHTML = `
+    <div class="empty-state">
+      <div class="empty-icon">⌨</div>
+      <div class="empty-text">// select a problem to view solution</div>
+    </div>`;
+}
+
+function renderProblems() {
+  if (!activeTopicKey) return;
+  const topic = data[activeTopicKey];
+  document.getElementById('problem-list-title').textContent = `// ${activeTopicKey.toLowerCase()}`;
+
+  const container = document.getElementById('problem-list');
+  container.innerHTML = '';
+
+  topic.problems.forEach(prob => {
+    const el = document.createElement('div');
+    el.className = 'problem-item' + (prob.id === activeProblemId ? ' active' : '');
+    el.innerHTML = `
+      <div class="problem-title">${prob.title}</div>
+      <div class="problem-meta">
+        <span class="diff diff-${prob.difficulty}">${prob.difficulty}</span>
+        <span class="cf-link">CF ↗</span>
+      </div>
+    `;
+    el.onclick = () => selectProblem(prob);
+    container.appendChild(el);
+  });
+}
+
+function selectProblem(prob) {
+  activeProblemId = prob.id;
+  renderProblems();
+
+  const panel = document.getElementById('code-panel');
+  panel.innerHTML = `
+    <div class="solution-view">
+      <div class="solution-header">
+        <h2>${prob.title}</h2>
+        <div class="problem-meta">
+          <span class="diff diff-${prob.difficulty}">${prob.difficulty}</span>
+          <a href="${prob.link}" target="_blank" style="font-size:0.75rem; color: var(--accent); font-family: 'JetBrains Mono', monospace; text-decoration: none;">view on codeforces ↗</a>
+        </div>
+        <div class="solution-tags">
+          ${prob.tags.map(t => `<span class="tag">${t}</span>`).join('')}
+        </div>
+      </div>
+
+      <div class="section-label">// explanation</div>
+      <div class="explanation">${prob.explanation}</div>
+
+      <div class="section-label">// solution</div>
+      <div class="code-block">
+        <div class="code-topbar">
+          <span class="code-lang">C++</span>
+          <button class="copy-btn" onclick="copyCode(this)">copy</button>
+        </div>
+        <pre id="code-content">${escapeHtml(prob.code)}</pre>
+      </div>
+    </div>
+  `;
+}
+
+function escapeHtml(str) {
+  return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+function copyCode(btn) {
+  const code = document.getElementById('code-content').textContent;
+  navigator.clipboard.writeText(code).then(() => {
+    btn.textContent = 'copied!';
+    btn.style.color = 'var(--accent2)';
+    btn.style.borderColor = 'var(--accent2)';
+    setTimeout(() => {
+      btn.textContent = 'copy';
+      btn.style.color = '';
+      btn.style.borderColor = '';
+    }, 1500);
+  });
+}
+
+// Init
+renderTopics();
+</script>
+</body>
+</html>
